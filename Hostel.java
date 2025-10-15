@@ -14,6 +14,10 @@ public class Hostel {
     private List<Complaint> complaints;
     private List<Visitor> visitors;
     private List<Notice> notices;
+    private List<LeaveRequest> leaveRequests; // New
+
+    private double previousDayFoodWastage; // New
+    private boolean isCleaningDoneToday;   // New
 
     private static final String ROOM_FILE = "rooms.dat";
     private static final String STUDENT_FILE = "students.dat";
@@ -22,9 +26,14 @@ public class Hostel {
     public Hostel() {
         rooms = loadData(ROOM_FILE);
         students = loadData(STUDENT_FILE);
-        complaints = new ArrayList<>(); // These could also be serialized if needed
+        complaints = new ArrayList<>();
         visitors = new ArrayList<>();
         notices = new ArrayList<>();
+        leaveRequests = new ArrayList<>(); // New
+
+        // Example initial values for new features
+        this.previousDayFoodWastage = 15.5; // in kg
+        this.isCleaningDoneToday = false;
     }
 
     // Generic method to load serialized data from a file
@@ -81,7 +90,6 @@ public class Hostel {
         saveData(STUDENT_FILE, students);
     }
 
-
     // --- Room Allocation ---
     public boolean allocateRoom(String rollNumber, String roomNumber) {
         Optional<Student> studentOpt = findStudent(rollNumber);
@@ -118,7 +126,34 @@ public class Hostel {
         return false;
     }
 
-    // --- Other Functionalities (to be implemented) ---
+    // --- New Feature Getters and Setters ---
+    public double getPreviousDayFoodWastage() {
+        return previousDayFoodWastage;
+    }
+
+    public void setPreviousDayFoodWastage(double wastage) {
+        this.previousDayFoodWastage = wastage;
+    }
+
+    public boolean isCleaningDoneToday() {
+        return isCleaningDoneToday;
+    }
+
+    public void setCleaningDoneToday(boolean done) {
+        isCleaningDoneToday = done;
+    }
+
+    // --- New Leave Request Management ---
+    public void addLeaveRequest(LeaveRequest request) {
+        leaveRequests.add(request);
+        // In a real app, you would save this list to a file as well
+    }
+
+    public List<LeaveRequest> getLeaveRequests() {
+        return leaveRequests;
+    }
+
+    // --- Other Functionalities ---
     public void addComplaint(Complaint complaint) {
         complaints.add(complaint);
     }
@@ -141,5 +176,5 @@ public class Hostel {
 
     public List<Notice> getNotices() {
         return notices;
-    }
+}
 }

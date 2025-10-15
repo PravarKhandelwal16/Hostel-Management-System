@@ -12,30 +12,28 @@ public class MainFrame extends JFrame {
     public MainFrame() {
         hostel = new Hostel();
 
-        setTitle("Smart Hostel Management System");
-        setSize(800, 600);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null); // Center the window
-        System.out.println("Hostel Management System started.");
-        // --- Set a modern Look and Feel ---
+        // --- Set the best built-in Look and Feel: Nimbus ---
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Nimbus Look and Feel not found. Using default.");
         }
+
+        setTitle("Smart Hostel Management System");
+        setSize(900, 700);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null); // Center the window
 
         // --- Main Tabbed Pane ---
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setFont(new Font("Segoe UI", Font.BOLD, 14));
 
         // --- Add Panels for each module ---
-        tabbedPane.addTab("Dashboard", new DashboardPanel());
+        tabbedPane.addTab("Dashboard", new DashboardPanel(hostel)); // Uses the NEW Dashboard
         tabbedPane.addTab("Manage Rooms", new RoomManagementPanel(hostel));
         tabbedPane.addTab("Manage Students", new StudentManagementPanel(hostel));
         tabbedPane.addTab("Room Allocation", new RoomAllocationPanel(hostel));
-        // Add other panels here as they are created
-        // tabbedPane.addTab("Fee Management", new FeePanel(hostel));
-        // tabbedPane.addTab("Complaints", new ComplaintPanel(hostel));
+        // You can add more tabs here
 
         add(tabbedPane);
     }
@@ -44,18 +42,6 @@ public class MainFrame extends JFrame {
         // Run the GUI on the Event Dispatch Thread
         SwingUtilities.invokeLater(() -> {
             new MainFrame().setVisible(true);
-        });
-    }
+});
 }
-
-/**
- * A simple placeholder dashboard panel.
- */
-class DashboardPanel extends JPanel {
-    public DashboardPanel() {
-        setLayout(new BorderLayout());
-        JLabel welcomeLabel = new JLabel("Welcome to the Smart Hostel Management System", SwingConstants.CENTER);
-        welcomeLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
-        add(welcomeLabel, BorderLayout.CENTER);
-    }
 }
