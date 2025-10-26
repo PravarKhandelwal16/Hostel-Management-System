@@ -1,180 +1,80 @@
-import java.io.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-/**
- * Manages all hostel data and operations.
- * This class acts as the backend logic for the hostel management system.
- * It handles adding, retrieving, and updating rooms, students, and other entities.
- */
 public class Hostel {
-    private List<Room> rooms;
+    
+    // Basic Hostel status variables
+    private double thisMonthFoodWastage = 120.5; 
+    private double lastMonthFoodWastage = 120.0; 
+    private boolean cleaningDoneToday = false;
+    private LocalDate lastConfirmationDate = null;
+    
+    // Student Data
     private List<Student> students;
-    private List<Complaint> complaints;
-    private List<Visitor> visitors;
-    private List<Notice> notices;
-    private List<LeaveRequest> leaveRequests; // New
 
-    private double previousDayFoodWastage; // New
-    private boolean isCleaningDoneToday;   // New
-
-    private static final String ROOM_FILE = "rooms.dat";
-    private static final String STUDENT_FILE = "students.dat";
-
-    // Constructor initializes lists and loads data from files
     public Hostel() {
-        rooms = loadData(ROOM_FILE);
-        students = loadData(STUDENT_FILE);
-        complaints = new ArrayList<>();
-        visitors = new ArrayList<>();
-        notices = new ArrayList<>();
-        leaveRequests = new ArrayList<>(); // New
-
-        // Example initial values for new features
-        this.previousDayFoodWastage = 15.5; // in kg
-        this.isCleaningDoneToday = false;
+        // Initialize sample student data
+        students = new ArrayList<>();
+        
+        // The first student is the one assumed to be "logged in" (Ashish)
+        students.add(new Student("Ashish V.", "205", "Active", "B.Tech CSE", "IInd", "19CS1001", "9876543210"));
+        students.add(new Student("Bob Smith", "102", "On Leave", "B.Tech ECE", "IIIrd", "18EC1002", "8888877777"));
+        students.add(new Student("Charlie Brown", "103", "Active", "B.Sc Physics", "Ist", "20PH1003", "9999900000"));
     }
-
-    // Generic method to load serialized data from a file
-    @SuppressWarnings("unchecked")
-    private <T> List<T> loadData(String filename) {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filename))) {
-            return (List<T>) ois.readObject();
-        } catch (FileNotFoundException e) {
-            return new ArrayList<>(); // Return new list if file doesn't exist yet
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return new ArrayList<>();
-        }
-    }
-
-    // Generic method to save serialized data to a file
-    private <T> void saveData(String filename, List<T> data) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filename))) {
-            oos.writeObject(data);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // --- Room Management ---
-    public void addRoom(Room room) {
-        rooms.add(room);
-        saveData(ROOM_FILE, rooms);
-    }
-
-    public List<Room> getAllRooms() {
-        return rooms;
-    }
-
-    public Optional<Room> findRoom(String roomNumber) {
-        return rooms.stream().filter(r -> r.getRoomNumber().equals(roomNumber)).findFirst();
-    }
-
-    // --- Student Management ---
-    public void addStudent(Student student) {
-        students.add(student);
-        saveData(STUDENT_FILE, students);
-    }
-
+    
+    // --- Methods ---
+    
     public List<Student> getAllStudents() {
         return students;
     }
 
-    public Optional<Student> findStudent(String rollNumber) {
-        return students.stream().filter(s -> s.getRollNumber().equals(rollNumber)).findFirst();
+    // --- Meal Plan Logic ---
+    
+    public boolean isMealPlanConfirmed() {
+        // Button is disabled only if confirmed TODAY
+        return lastConfirmationDate != null && lastConfirmationDate.isEqual(LocalDate.now());
     }
 
-    public void updateStudent(Student updatedStudent) {
-        saveData(STUDENT_FILE, students);
-    }
-
-    // --- Room Allocation ---
-    public boolean allocateRoom(String rollNumber, String roomNumber) {
-        Optional<Student> studentOpt = findStudent(rollNumber);
-        Optional<Room> roomOpt = findRoom(roomNumber);
-
-        if (studentOpt.isPresent() && roomOpt.isPresent()) {
-            Student student = studentOpt.get();
-            Room room = roomOpt.get();
-            if (room.isAvailable()) {
-                student.setRoomNumber(roomNumber);
-                room.setAvailable(false);
-                saveData(STUDENT_FILE, students);
-                saveData(ROOM_FILE, rooms);
-                return true;
-            }
+    public void setMealPlanConfirmed(boolean confirmed) {
+        if (confirmed) {
+            this.lastConfirmationDate = LocalDate.now();
+        } else {
+            this.lastConfirmationDate = null;
         }
-        return false;
     }
 
-    public boolean vacateRoom(String rollNumber) {
-        Optional<Student> studentOpt = findStudent(rollNumber);
-        if(studentOpt.isPresent()) {
-            Student student = studentOpt.get();
-            Optional<Room> roomOpt = findRoom(student.getRoomNumber());
-            if(roomOpt.isPresent()) {
-                Room room = roomOpt.get();
-                room.setAvailable(true);
-                student.setRoomNumber("Not Allocated");
-                saveData(STUDENT_FILE, students);
-                saveData(ROOM_FILE, rooms);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // --- New Feature Getters and Setters ---
-    public double getPreviousDayFoodWastage() {
-        return previousDayFoodWastage;
-    }
-
-    public void setPreviousDayFoodWastage(double wastage) {
-        this.previousDayFoodWastage = wastage;
-    }
+    // --- Cleaning Status Logic ---
 
     public boolean isCleaningDoneToday() {
-        return isCleaningDoneToday;
+        return cleaningDoneToday;
     }
 
-    public void setCleaningDoneToday(boolean done) {
-        isCleaningDoneToday = done;
+    public void setCleaningDoneToday(boolean cleaningDoneToday) {
+        this.cleaningDoneToday = cleaningDoneToday;
+    }
+    
+    // --- Food Wastage Logic (Fix for StaffPanel Error) ---
+    
+    public double getThisMonthFoodWastage() {
+        return thisMonthFoodWastage;
     }
 
-    // --- New Leave Request Management ---
-    public void addLeaveRequest(LeaveRequest request) {
-        leaveRequests.add(request);
-        // In a real app, you would save this list to a file as well
+    /**
+     * Setter method required by StaffPanel to increase/decrease food wastage.
+     */
+    public void setThisMonthFoodWastage(double thisMonthFoodWastage) {
+        // Ensure wastage doesn't go below zero
+        if (thisMonthFoodWastage >= 0) {
+            this.thisMonthFoodWastage = thisMonthFoodWastage;
+        } else {
+            this.thisMonthFoodWastage = 0;
+        }
     }
 
-    public List<LeaveRequest> getLeaveRequests() {
-        return leaveRequests;
+    public double getFoodWastageChangePercent() {
+        if (lastMonthFoodWastage == 0) return 0;
+        double change = thisMonthFoodWastage - lastMonthFoodWastage;
+        return (change / lastMonthFoodWastage) * 100;
     }
-
-    // --- Other Functionalities ---
-    public void addComplaint(Complaint complaint) {
-        complaints.add(complaint);
-    }
-
-    public List<Complaint> getComplaints() {
-        return complaints;
-    }
-
-    public void addVisitor(Visitor visitor) {
-        visitors.add(visitor);
-    }
-
-    public List<Visitor> getVisitors() {
-        return visitors;
-    }
-
-    public void addNotice(Notice notice) {
-        notices.add(notice);
-    }
-
-    public List<Notice> getNotices() {
-        return notices;
-}
 }

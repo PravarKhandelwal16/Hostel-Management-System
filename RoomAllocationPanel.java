@@ -1,102 +1,67 @@
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 
-/**
- * GUI Panel for allocating rooms to students.
- */
 public class RoomAllocationPanel extends JPanel {
     private Hostel hostel;
-    private JComboBox<String> studentComboBox;
-    private JComboBox<String> roomComboBox;
 
     public RoomAllocationPanel(Hostel hostel) {
         this.hostel = hostel;
-        setLayout(new BorderLayout(10, 10));
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        setLayout(new BorderLayout(15, 15));
+        setBorder(new EmptyBorder(15, 15, 15, 15));
+        setBackground(new Color(240, 240, 240));
 
-        JPanel allocationPanel = new JPanel(new GridLayout(3, 2, 10, 10));
-        allocationPanel.setBorder(new TitledBorder("Allocate a Room"));
+        add(createAllocationForm(), BorderLayout.NORTH);
+        add(new PlaceholderPanel("Live Allocation Status and History View"), BorderLayout.CENTER);
+    }
 
-        // --- Student and Room Selection ---
-        allocationPanel.add(new JLabel("Select Student (by Roll No):"));
-        studentComboBox = new JComboBox<>();
-        allocationPanel.add(studentComboBox);
+    private JPanel createAllocationForm() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(Color.WHITE);
+        
+        // --- FIX: Corrected createTitledBorder usage ---
+        TitledBorder titledBorder = BorderFactory.createTitledBorder(
+            BorderFactory.createLineBorder(new Color(150, 150, 150)), 
+            "Allocate / Reallocate Room", 
+            TitledBorder.LEFT, TitledBorder.TOP, 
+            new Font("Segoe UI", Font.BOLD, 14),
+            new Color(44, 62, 80)
+        );
+        panel.setBorder(titledBorder);
+        // --- END FIX ---
 
-        allocationPanel.add(new JLabel("Select Available Room:"));
-        roomComboBox = new JComboBox<>();
-        allocationPanel.add(roomComboBox);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.WEST;
+        
+        // --- Input Fields ---
+        
+        // Student Field (Using a text field for simple ID entry)
+        JLabel studentLabel = new JLabel("Student Roll No:");
+        JTextField studentField = new JTextField(15);
+        gbc.gridx = 0; gbc.gridy = 0; panel.add(studentLabel, gbc);
+        gbc.gridx = 1; gbc.gridy = 0; panel.add(studentField, gbc);
 
+        // Room Field (Using a text field for simple room number entry)
+        JLabel roomLabel = new JLabel("Target Room No:");
+        JTextField roomField = new JTextField(15);
+        gbc.gridx = 0; gbc.gridy = 1; panel.add(roomLabel, gbc);
+        gbc.gridx = 1; gbc.gridy = 1; panel.add(roomField, gbc);
+        
+        // --- Buttons ---
+        
+        // Check Status Button (to confirm if student/room is valid)
+        JButton checkButton = new JButton("Check Status");
+        checkButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        gbc.gridx = 2; gbc.gridy = 0; gbc.ipadx = 10; panel.add(checkButton, gbc);
+
+        // Allocate Button
         JButton allocateButton = new JButton("Allocate Room");
-        JButton vacateButton = new JButton("Vacate Room");
-        allocationPanel.add(allocateButton);
-        allocationPanel.add(vacateButton);
+        allocateButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        gbc.gridx = 2; gbc.gridy = 1; gbc.ipadx = 10; panel.add(allocateButton, gbc);
 
-        // --- Add a refresh button ---
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        JButton refreshButton = new JButton("Refresh Lists");
-        bottomPanel.add(refreshButton);
-
-        add(allocationPanel, BorderLayout.NORTH);
-        add(bottomPanel, BorderLayout.SOUTH);
-
-        // --- Event Listeners ---
-        allocateButton.addActionListener(e -> allocateRoom());
-        vacateButton.addActionListener(e -> vacateRoom());
-        refreshButton.addActionListener(e -> refreshComboBoxes());
-
-        // Initial data load
-        refreshComboBoxes();
-    }
-
-    private void allocateRoom() {
-        String studentRoll = (String) studentComboBox.getSelectedItem();
-        String roomNumber = (String) roomComboBox.getSelectedItem();
-
-        if (studentRoll == null || roomNumber == null) {
-            JOptionPane.showMessageDialog(this, "Please select a student and a room.", "Selection Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        if (hostel.allocateRoom(studentRoll, roomNumber)) {
-            JOptionPane.showMessageDialog(this, "Room allocated successfully!");
-            refreshComboBoxes();
-        } else {
-            JOptionPane.showMessageDialog(this, "Failed to allocate room. It might be occupied or student/room not found.", "Allocation Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void vacateRoom() {
-        String studentRoll = (String) studentComboBox.getSelectedItem();
-        if (studentRoll == null) {
-            JOptionPane.showMessageDialog(this, "Please select a student to vacate.", "Selection Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        if(hostel.vacateRoom(studentRoll)) {
-            JOptionPane.showMessageDialog(this, "Room vacated successfully!");
-            refreshComboBoxes();
-        } else {
-            JOptionPane.showMessageDialog(this, "Failed to vacate room.", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void refreshComboBoxes() {
-        // --- Refresh Students ---
-        studentComboBox.removeAllItems();
-        hostel.getAllStudents().stream()
-                .filter(s -> "Not Allocated".equals(s.getRoomNumber()))
-                .forEach(s -> studentComboBox.addItem(s.getRollNumber()));
-
-        //Also add allocated students to vacate them
-        hostel.getAllStudents().stream()
-                .filter(s -> !"Not Allocated".equals(s.getRoomNumber()))
-                .forEach(s -> studentComboBox.addItem(s.getRollNumber()));
-
-        // --- Refresh Rooms ---
-        roomComboBox.removeAllItems();
-        hostel.getAllRooms().stream()
-                .filter(Room::isAvailable)
-                .forEach(r -> roomComboBox.addItem(r.getRoomNumber()));
+        return panel;
     }
 }

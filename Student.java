@@ -1,83 +1,67 @@
-import java.io.Serializable;
-
-/**
- * Represents a student in the hostel.
- * This class holds all information related to a student.
- * It is Serializable to allow for saving the object's state.
- */
-public class Student implements Serializable {
+public class Student {
     private String name;
-    private String rollNumber;
     private String roomNumber;
-    private String mobileNumber;
-    private String parentMobileNumber;
-    private String course;
+    private String status; 
+    private String course; 
+    private String year; 
+    private String rollNumber; 
+    private String mobileNumber; 
 
-    // Constructor to initialize a Student object
-    public Student(String name, String rollNumber, String mobileNumber, String parentMobileNumber, String course) {
+    public Student(String name, String roomNumber, String status, String course, String year, String rollNumber, String mobileNumber) {
         this.name = name;
+        // Use "Not Allocated" if a room number wasn't provided at creation
+        this.roomNumber = (roomNumber == null || roomNumber.isEmpty()) ? "Not Allocated" : roomNumber;
+        this.status = status;
+        this.course = course;
+        this.year = year;
         this.rollNumber = rollNumber;
         this.mobileNumber = mobileNumber;
-        this.parentMobileNumber = parentMobileNumber;
-        this.course = course;
-        this.roomNumber = "Not Allocated"; // Default room status
     }
 
-    // Getters and setters for student attributes
+    // --- Getters ---
+    
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getRoomNumber() {
+        // Return "Not Allocated" if the field is null/empty for display consistency
+        return (roomNumber == null || roomNumber.isEmpty()) ? "Not Allocated" : roomNumber;
     }
 
+    public String getStatus() {
+        return status;
+    }
+    
+    public String getCourse() {
+        return course;
+    }
+    
+    public String getYear() {
+        return year;
+    }
+    
     public String getRollNumber() {
         return rollNumber;
     }
-
-    public void setRollNumber(String rollNumber) {
-        this.rollNumber = rollNumber;
-    }
-
-    public String getRoomNumber() {
-        return roomNumber;
-    }
-
-    public void setRoomNumber(String roomNumber) {
-        this.roomNumber = roomNumber;
-    }
-
+    
     public String getMobileNumber() {
         return mobileNumber;
     }
 
-    public void setMobileNumber(String mobileNumber) {
-        this.mobileNumber = mobileNumber;
+    // --- Setters (REQUIRED for Room Allocation and Status Updates) ---
+
+    /**
+     * Allows staff to change a student's assigned room.
+     */
+    public void setRoomNumber(String roomNumber) {
+        this.roomNumber = roomNumber;
     }
 
-    public String getParentMobileNumber() {
-        return parentMobileNumber;
-    }
-
-    public void setParentMobileNumber(String parentMobileNumber) {
-        this.parentMobileNumber = parentMobileNumber;
-    }
-
-    public String getCourse() {
-        return course;
-    }
-
-    public void setCourse(String course) {
-        this.course = course;
-    }
-
-    @Override
-    public String toString() {
-        return "Student{" +
-                "name='" + name + '\'' +
-                ", rollNumber='" + rollNumber + '\'' +
-                ", roomNumber='" + roomNumber + '\'' +
-                '}';
+    /**
+     * Allows staff to change a student's activity status (e.g., Active, On Leave).
+     */
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
