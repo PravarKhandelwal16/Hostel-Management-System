@@ -17,6 +17,10 @@ public class StudentManagementPanel extends JPanel {
     private JTextField courseField;
     private JComboBox<String> yearCombo;
     private JTextField mobileField;
+    // --- NEW UI FIELDS ---
+    private JTextField usernameField;
+    private JPasswordField passwordField; // Use JPasswordField for password
+    
     private JButton saveButton;
     private JButton deleteButton;
 
@@ -50,41 +54,60 @@ public class StudentManagementPanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.WEST;
 
-        // Labels and Fields (Removed Initial Status)
+        // Labels and Fields
         JLabel nameLabel = new JLabel("Name:");
         JLabel rollNumberLabel = new JLabel("Roll Number:");
         JLabel courseLabel = new JLabel("Course:");
         JLabel yearLabel = new JLabel("Year:");
         JLabel mobileLabel = new JLabel("Mobile Number:");
+        // --- NEW LABELS ---
+        JLabel usernameLabel = new JLabel("Username:");
+        JLabel passwordLabel = new JLabel("Password:");
 
         nameField = new JTextField(15); 
         rollNumberField = new JTextField(10);
         courseField = new JTextField(15); 
         yearCombo = new JComboBox<>(new String[]{"Ist", "IInd", "IIIrd", "IVth"});
         mobileField = new JTextField(15);
+        // --- NEW FIELDS ---
+        usernameField = new JTextField(15);
+        passwordField = new JPasswordField(15);
         
         saveButton = new JButton("Save New Student");
         saveButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
         
-        // Layout Components
+        // --- UPDATED LAYOUT ---
         int row = 0;
+        // Row 0: Name
         gbc.gridx = 0; gbc.gridy = row; panel.add(nameLabel, gbc);
-        gbc.gridx = 1; gbc.gridy = row; panel.add(nameField, gbc); row++;
+        gbc.gridx = 1; gbc.gridy = row; panel.add(nameField, gbc);
         
-        gbc.gridx = 0; gbc.gridy = row; panel.add(rollNumberLabel, gbc);
-        gbc.gridx = 1; gbc.gridy = row; panel.add(rollNumberField, gbc); row++;
+        // Row 1: Roll Number
+        gbc.gridx = 0; gbc.gridy = ++row; panel.add(rollNumberLabel, gbc);
+        gbc.gridx = 1; gbc.gridy = row; panel.add(rollNumberField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = row; panel.add(courseLabel, gbc);
-        gbc.gridx = 1; gbc.gridy = row; panel.add(courseField, gbc); row++;
+        // Row 2: Course
+        gbc.gridx = 0; gbc.gridy = ++row; panel.add(courseLabel, gbc);
+        gbc.gridx = 1; gbc.gridy = row; panel.add(courseField, gbc);
         
-        gbc.gridx = 0; gbc.gridy = row; panel.add(yearLabel, gbc);
-        gbc.gridx = 1; gbc.gridy = row; panel.add(yearCombo, gbc); row++;
+        // Row 3: Year
+        gbc.gridx = 0; gbc.gridy = ++row; panel.add(yearLabel, gbc);
+        gbc.gridx = 1; gbc.gridy = row; panel.add(yearCombo, gbc);
         
-        gbc.gridx = 0; gbc.gridy = row; panel.add(mobileLabel, gbc);
-        gbc.gridx = 1; gbc.gridy = row; panel.add(mobileField, gbc); row++;
+        // Row 4: Mobile
+        gbc.gridx = 0; gbc.gridy = ++row; panel.add(mobileLabel, gbc);
+        gbc.gridx = 1; gbc.gridy = row; panel.add(mobileField, gbc);
         
-        // Save Button
-        gbc.gridx = 1; gbc.gridy = row; gbc.anchor = GridBagConstraints.EAST; panel.add(saveButton, gbc);
+        // Row 5: Username
+        gbc.gridx = 0; gbc.gridy = ++row; panel.add(usernameLabel, gbc);
+        gbc.gridx = 1; gbc.gridy = row; panel.add(usernameField, gbc);
+        
+        // Row 6: Password
+        gbc.gridx = 0; gbc.gridy = ++row; panel.add(passwordLabel, gbc);
+        gbc.gridx = 1; gbc.gridy = row; panel.add(passwordField, gbc);
+        
+        // Row 7: Save Button
+        gbc.gridx = 1; gbc.gridy = ++row; gbc.anchor = GridBagConstraints.EAST; panel.add(saveButton, gbc);
 
         return panel;
     }
@@ -93,8 +116,8 @@ public class StudentManagementPanel extends JPanel {
         JPanel section = new JPanel(new BorderLayout(10, 10));
         section.setOpaque(false);
         
-        // --- Table Setup ---
-        String[] columnNames = {"Name", "Roll Number", "Course", "Year", "Mobile", "Status", "Room No."};
+        // --- UPDATED TABLE ---
+        String[] columnNames = {"Name", "Roll Number", "Course", "Year", "Mobile", "Status", "Room No.", "Username"};
         
         // Load initial data from the Hostel model
         List<Student> initialStudents = hostel.getAllStudents();
@@ -106,11 +129,10 @@ public class StudentManagementPanel extends JPanel {
             initialData[i][1] = s.getRollNumber();
             initialData[i][2] = s.getCourse();
             initialData[i][3] = s.getYear();
-            // --- FIX APPLIED HERE ---
-            initialData[i][4] = s.getMobileNumber(); // Calling the correct method
-            // ------------------------
+            initialData[i][4] = s.getMobileNumber();
             initialData[i][5] = s.getStatus();
             initialData[i][6] = s.getRoomNumber();
+            initialData[i][7] = s.getUsername(); // Add username
         }
         
         tableModel = new DefaultTableModel(initialData, columnNames);
@@ -153,35 +175,53 @@ public class StudentManagementPanel extends JPanel {
         });
     }
 
+    // --- UPDATED METHOD ---
     private void addNewStudent() {
         String name = nameField.getText().trim();
         String rollNumber = rollNumberField.getText().trim();
         String course = courseField.getText().trim();
         String year = (String) yearCombo.getSelectedItem();
         String mobile = mobileField.getText().trim();
+        String username = usernameField.getText().trim();
+        String password = new String(passwordField.getPassword()); // Get password
 
-        if (name.isEmpty() || rollNumber.isEmpty() || course.isEmpty() || mobile.isEmpty()) {
+        if (name.isEmpty() || rollNumber.isEmpty() || course.isEmpty() || mobile.isEmpty() || username.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "All fields must be filled out.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // Check if student already exists (simple check against table data by roll number)
-        for (int i = 0; i < tableModel.getRowCount(); i++) {
-            if (tableModel.getValueAt(i, 1).equals(rollNumber)) {
-                JOptionPane.showMessageDialog(this, "Student with Roll Number " + rollNumber + " already exists.", "Error", JOptionPane.ERROR_MESSAGE);
+        // Check if student already exists (in the main Hostel list)
+        for (Student s : hostel.getAllStudents()) {
+            if (s.getRollNumber().equals(rollNumber) || s.getUsername().equals(username)) {
+                JOptionPane.showMessageDialog(this, "Student with this Roll Number or Username already exists.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
         }
 
-        // Add the new student to the table model
+        // --- Create and add student to the Hostel model ---
+        Student newStudent = new Student(
+            name, 
+            "Not Allocated", // Default room
+            "Active",        // Default status
+            course, 
+            year, 
+            rollNumber, 
+            mobile,
+            username,
+            password
+        );
+        hostel.getAllStudents().add(newStudent);
+
+        // Add the new student to the table model (DON'T add password)
         tableModel.addRow(new Object[]{
             name, 
             rollNumber, 
             course, 
             year, 
             mobile,
-            "Active", // Default initial status
-            "Not Allocated" // Default room number
+            "Active", 
+            "Not Allocated",
+            username // Add username to table
         });
         
         // Clear fields after successful addition
@@ -189,11 +229,14 @@ public class StudentManagementPanel extends JPanel {
         rollNumberField.setText("");
         courseField.setText("");
         mobileField.setText("");
+        usernameField.setText("");
+        passwordField.setText("");
         yearCombo.setSelectedIndex(0);
         
         JOptionPane.showMessageDialog(this, "Student " + name + " saved successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
     }
     
+    // --- UPDATED METHOD ---
     private void deleteSelectedStudent() {
         JTable table = (JTable) ((JScrollPane) ((JPanel) getComponent(1)).getComponent(0)).getViewport().getView();
         int selectedRow = table.getSelectedRow();
@@ -204,6 +247,7 @@ public class StudentManagementPanel extends JPanel {
         }
 
         String studentName = (String) tableModel.getValueAt(selectedRow, 0);
+        String rollNumber = (String) tableModel.getValueAt(selectedRow, 1);
         
         // Confirmation dialog
         int confirm = JOptionPane.showConfirmDialog(
@@ -214,6 +258,9 @@ public class StudentManagementPanel extends JPanel {
         );
 
         if (confirm == JOptionPane.YES_OPTION) {
+            // --- Remove from Hostel model ---
+            hostel.getAllStudents().removeIf(student -> student.getRollNumber().equals(rollNumber));
+            
             // Remove the row from the table model
             tableModel.removeRow(selectedRow);
             JOptionPane.showMessageDialog(this, "Student record deleted successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);

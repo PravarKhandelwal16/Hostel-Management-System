@@ -45,7 +45,8 @@ public class MainFrame extends JFrame {
             String userType = selectionDialog.getUserType();
             
             if ("Student".equals(userType)) {
-                StudentLoginDialog loginDialog = new StudentLoginDialog(this);
+                // --- UPDATED DIALOG CREATION ---
+                StudentLoginDialog loginDialog = new StudentLoginDialog(this, hostel);
                 loginDialog.setVisible(true); 
                 
                 if (loginDialog.isLoginSuccessful()) {
@@ -111,6 +112,8 @@ public class MainFrame extends JFrame {
         tabbedPane.setFont(new Font("Segoe UI", Font.BOLD, 14));
         tabbedPane.addTab("Dashboard", dashboardPanel);
         // NOTE: AboutMePanel class must be available
+        // This will now work correctly because AboutMePanel will get the
+        // loggedInStudent from the hostel object.
         tabbedPane.addTab("About Me", new AboutMePanel(hostel)); 
         return tabbedPane;
     }

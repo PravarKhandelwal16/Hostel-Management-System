@@ -1,22 +1,20 @@
+import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
-import java.awt.*;
 
 public class AboutMePanel extends JPanel {
 
     private Hostel hostel;
     private Student currentStudent; 
 
+    // --- UPDATED CONSTRUCTOR ---
     public AboutMePanel(Hostel hostel) {
         this.hostel = hostel;
         
-        // Assume the first student in the list is the "logged-in" student
-        if (!hostel.getAllStudents().isEmpty()) {
-            this.currentStudent = hostel.getAllStudents().get(0);
-        } else {
-            this.currentStudent = null;
-        }
+        // --- THIS IS THE KEY CHANGE ---
+        // Get the student who just logged in from the hostel object
+        this.currentStudent = hostel.getLoggedInStudent();
 
         setLayout(new BorderLayout(20, 20));
         setBorder(new EmptyBorder(30, 30, 30, 30));
@@ -25,6 +23,7 @@ public class AboutMePanel extends JPanel {
         if (currentStudent != null) {
             add(createDetailsPanel(), BorderLayout.NORTH);
         } else {
+            // This case might happen if something went wrong, e.g., login succeeded but student was null
             add(new JLabel("No student profile data found.", SwingConstants.CENTER), BorderLayout.CENTER);
         }
     }

@@ -12,15 +12,19 @@ public class Hostel {
     
     // Student Data
     private List<Student> students;
+    
+    // --- NEW FIELD ---
+    private Student loggedInStudent;
 
     public Hostel() {
         // Initialize sample student data
         students = new ArrayList<>();
         
+        // --- UPDATED CONSTRUCTOR CALLS ---
         // The first student is the one assumed to be "logged in" (Ashish)
-        students.add(new Student("Ashish V.", "205", "Active", "B.Tech CSE", "IInd", "19CS1001", "9876543210"));
-        students.add(new Student("Bob Smith", "102", "On Leave", "B.Tech ECE", "IIIrd", "18EC1002", "8888877777"));
-        students.add(new Student("Charlie Brown", "103", "Active", "B.Sc Physics", "Ist", "20PH1003", "9999900000"));
+        students.add(new Student("Ashish V.", "205", "Active", "B.Tech CSE", "IInd", "19CS1001", "9876543210", "ashish", "pass123"));
+        students.add(new Student("Bob Smith", "102", "On Leave", "B.Tech ECE", "IIIrd", "18EC1002", "8888877777", "bob", "pass123"));
+        students.add(new Student("Charlie Brown", "103", "Active", "B.Sc Physics", "Ist", "20PH1003", "9999900000", "charlie", "pass123"));
     }
     
     // --- Methods ---
@@ -28,6 +32,30 @@ public class Hostel {
     public List<Student> getAllStudents() {
         return students;
     }
+
+    // --- NEW METHODS for Login ---
+
+    /**
+     * Tries to find a student with matching username and password.
+     * @return The matching Student object if login is successful, otherwise null.
+     */
+    public Student validateStudentLogin(String username, String password) {
+        for (Student student : students) {
+            if (student.getUsername().equals(username) && student.getPassword().equals(password)) {
+                return student;
+            }
+        }
+        return null; // No match found
+    }
+
+    public void setLoggedInStudent(Student student) {
+        this.loggedInStudent = student;
+    }
+
+    public Student getLoggedInStudent() {
+        return loggedInStudent;
+    }
+
 
     // --- Meal Plan Logic ---
     

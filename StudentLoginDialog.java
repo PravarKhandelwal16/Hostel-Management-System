@@ -6,16 +6,19 @@ import java.awt.event.ActionListener;
 
 public class StudentLoginDialog extends JDialog {
     
-    // Fixed Credentials
-    private static final String VALID_USERNAME = "SRM";
-    private static final String VALID_PASSWORD = "0000";
+    // --- REMOVED HARDCODED CREDENTIALS ---
     
     private boolean loginSuccessful = false;
     private JTextField usernameField;
     private JPasswordField passwordField;
+    
+    // --- NEW FIELD ---
+    private Hostel hostel;
 
-    public StudentLoginDialog(JFrame parent) {
+    // --- UPDATED CONSTRUCTOR ---
+    public StudentLoginDialog(JFrame parent, Hostel hostel) {
         super(parent, "Student Login", true); // Modal dialog
+        this.hostel = hostel; // Store the hostel reference
         
         setupUI();
         
@@ -77,12 +80,17 @@ public class StudentLoginDialog extends JDialog {
         add(buttonPanel, BorderLayout.SOUTH);
     }
     
+    // --- COMPLETELY REVISED METHOD ---
     private void attemptLogin() {
         String enteredUsername = usernameField.getText().trim();
         String enteredPassword = new String(passwordField.getPassword());
         
-        if (enteredUsername.equals(VALID_USERNAME) && enteredPassword.equals(VALID_PASSWORD)) {
+        // Validate against the Hostel's student list
+        Student loggedInStudent = hostel.validateStudentLogin(enteredUsername, enteredPassword);
+        
+        if (loggedInStudent != null) {
             loginSuccessful = true;
+            hostel.setLoggedInStudent(loggedInStudent); // --- SET THE LOGGED-IN STUDENT ---
             JOptionPane.showMessageDialog(this, "Login successful!", "Success", JOptionPane.INFORMATION_MESSAGE);
             dispose();
         } else {
