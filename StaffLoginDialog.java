@@ -10,7 +10,7 @@ public class StaffLoginDialog extends JDialog {
 
     private JPasswordField passwordField;
     private boolean loginSuccessful = false;
-    private static final String VALID_PASSWORD = "admin123";
+    private static final String VALID_PASSWORD = "admin";
 
     public StaffLoginDialog(JFrame owner) {
         super(owner, "Staff Login", true);
