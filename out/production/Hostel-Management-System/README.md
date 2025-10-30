@@ -13,8 +13,7 @@ A Java‑based desktop application to manage hostel operations (rooms, students,
 - [Setup & Installation](#setup--installation)  
 - [Usage](#usage)  
 - [Contributing](#contributing)  
-- [License](#license)  
-- [Contact](#contact)  
+- [License](#license)   
 
 ---
 
@@ -134,14 +133,6 @@ Please ensure code formatting is consistent, and add documentation / comments wh
 ## License
 
 This project is licensed under the **MIT License**.
-
----
-
-## Contact
-
-**Developer:** Pravar Khandelwal  
-**GitHub:** [PravarKhandelwal16](https://github.com/PravarKhandelwal16)  
-**Email:** *(add your email if desired)*  
 
 ---
 
