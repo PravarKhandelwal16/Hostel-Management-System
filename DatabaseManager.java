@@ -10,9 +10,9 @@ import javax.swing.JOptionPane; // --- FIX: Added the missing import ---
 public class DatabaseManager {
 
     // --- !!! YOU MUST EDIT THESE VALUES !!! ---
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/hostel_db"; // Your database URL
-    private static final String DB_USER = "root";    // Your MySQL username
-    private static final String DB_PASS = "Pravar@161106";        // Your MySQL password
+    private static final String DB_URL = "jdbc:mysql://sql12.freesqldatabase.com:3306/sql12804690"; // Your database URL
+    private static final String DB_USER = "sql12804690";    // Your MySQL username
+    private static final String DB_PASS = "13DgzEj4Gd";        // Your MySQL password
     // -------------------------------------------
 
     /**
