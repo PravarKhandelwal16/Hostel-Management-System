@@ -4,8 +4,19 @@ import javax.swing.border.EmptyBorder;
 
 public class StaffPanel extends JPanel {
 
-    // --- UPDATED CONSTRUCTOR ---
+    // MainFrame reference for logout
+    private MainFrame mainFrame;
+    private Hostel hostel;
+    // We won't use this, but adding it fixes the constructor error
+    private DashboardPanel dashboardPanel;
+
+    // --- CONSTRUCTOR UPDATED ---
+    // The order of parameters now matches what MainFrame.java is sending
     public StaffPanel(Hostel hostel, DashboardPanel dashboardPanel, MainFrame mainFrame) {
+        this.mainFrame = mainFrame; // Store the MainFrame reference
+        this.hostel = hostel;
+        this.dashboardPanel = dashboardPanel; // Store this to resolve the error
+
         setLayout(new BorderLayout());
         setBackground(new Color(230, 230, 230));
 
@@ -13,63 +24,55 @@ public class StaffPanel extends JPanel {
         staffTabbedPane.setFont(new Font("Segoe UI", Font.BOLD, 14));
 
         // Management Tabs
+        // We pass 'hostel' which is now correctly initialized
         staffTabbedPane.addTab("Manage Rooms", new RoomManagementPanel(hostel));
         staffTabbedPane.addTab("Manage Students", new StudentManagementPanel(hostel));
         staffTabbedPane.addTab("Room Allocation", new RoomAllocationPanel(hostel));
 
+        // --- NEW TAB ---
+        staffTabbedPane.addTab("Daily Status", new DailyStatusPanel());
+
         // Admin Controls Tab
-        JPanel testPanel = new JPanel(new FlowLayout());
-        testPanel.setBorder(new EmptyBorder(50, 50, 50, 50));
-
-        JButton increaseFoodButton = new JButton("Increase Food Wastage by 10kg");
-        increaseFoodButton.addActionListener(_ -> {
-            hostel.setThisMonthFoodWastage(hostel.getThisMonthFoodWastage() + 10);
-            JOptionPane.showMessageDialog(this, "Wastage data updated. Student view requires refresh.", "Data Change", JOptionPane.INFORMATION_MESSAGE);
-        });
-        testPanel.add(increaseFoodButton);
-
-        JButton decreaseFoodButton = new JButton("Decrease Food Wastage by 10kg");
-        decreaseFoodButton.addActionListener(_ -> {
-            double newWastage = Math.max(0, hostel.getThisMonthFoodWastage() - 10);
-            hostel.setThisMonthFoodWastage(newWastage);
-            JOptionPane.showMessageDialog(this, "Wastage data updated.", "Data Change", JOptionPane.INFORMATION_MESSAGE);
-        });
-        testPanel.add(decreaseFoodButton);
-
-        // --- NEW LOGOUT BUTTON ---
-        JButton logoutButton = new JButton("Logout");
-        logoutButton.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        logoutButton.setBackground(new Color(231, 76, 60));
-        logoutButton.setForeground(Color.WHITE);
-        // Add action listener to call the MainFrame's reset method
-        logoutButton.addActionListener(e -> mainFrame.showUserSelection());
-        testPanel.add(Box.createHorizontalStrut(20)); // Add some space
-        testPanel.add(logoutButton);
-        // --- END NEW ---
-
-        staffTabbedPane.addTab("Admin Controls", testPanel);
+        JPanel adminPanel = createAdminPanel();
+        staffTabbedPane.addTab("Admin Controls", adminPanel);
 
         add(staffTabbedPane, BorderLayout.CENTER);
     }
-}
 
-// =================================================================
-// NESTED UTILITY CLASS DEFINITION
-// =================================================================
+    // Helper method to create the admin panel with the logout button
+    private JPanel createAdminPanel() {
+        JPanel testPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 20));
+        testPanel.setBorder(new EmptyBorder(50, 50, 50, 50));
 
-/**
- * A minimal JPanel to serve as a content placeholder for a tab.
- */
-class PlaceholderPanel extends JPanel {
-    public PlaceholderPanel(String message) {
-        setLayout(new BorderLayout());
-        setBorder(new EmptyBorder(20, 20, 20, 20));
-        setBackground(Color.WHITE);
+        // --- Food Wastage Simulation ---
+        JButton increaseFoodButton = new JButton("Simulate: +10kg Food Wastage");
+        increaseFoodButton.addActionListener(_ -> {
+            JOptionPane.showMessageDialog(this,
+                    "Food wastage simulation. (This is just a test button).",
+                    "Data Change", JOptionPane.INFORMATION_MESSAGE);
+        });
+        testPanel.add(increaseFoodButton);
 
-        JLabel label = new JLabel(message, SwingConstants.CENTER);
-        label.setFont(new Font("Segoe UI", Font.ITALIC, 16));
-        label.setForeground(Color.GRAY);
+        // --- Logout Button ---
+        JButton logoutButton = new JButton("Logout");
+        logoutButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        logoutButton.setBackground(new Color(231, 76, 60)); // Red color
+        logoutButton.setForeground(Color.WHITE);
+        logoutButton.addActionListener(_ -> {
+            int choice = JOptionPane.showConfirmDialog(
+                    mainFrame,
+                    "Are you sure you want to logout?",
+                    "Logout",
+                    JOptionPane.YES_NO_OPTION
+            );
+            if (choice == JOptionPane.YES_OPTION) {
+                mainFrame.showUserSelection(); // Call the public method in MainFrame
+            }
+        });
 
-        add(label, BorderLayout.CENTER);
+        testPanel.add(logoutButton);
+
+        return testPanel;
     }
 }
+
